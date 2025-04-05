@@ -77,9 +77,7 @@ export function AuthProvider({ children }) {
       
       toast.success('Login successful');
       
-      // Redirect based on user role - This is where role-based routing happens
-      // The role is determined by the backend when the user logs in
-      // The frontend uses this role to direct users to their appropriate dashboard
+      // Redirect based on user role
       if (response.data.user.role === 'HR') {
         console.log('AuthContext: Redirecting to HR dashboard');
         router.push('/hr');
@@ -109,8 +107,6 @@ export function AuthProvider({ children }) {
     setError(null);
     try {
       console.log('Signing up with:', userData);
-      // Role selection is handled directly in the signup form
-      // The selected role is passed to the backend and stored with the user account
       const response = await auth.signup(userData);
       console.log('Signup response:', response.data);
       toast.success('Signup successful! Please login.');

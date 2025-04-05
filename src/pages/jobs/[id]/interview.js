@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
 import { jobs } from '@/utils/api';
 import Layout from '@/components/Layout';
@@ -22,10 +21,12 @@ import {
   ChatBubbleLeftRightIcon,
   UserGroupIcon
 } from '@heroicons/react/24/outline';
+import dynamic from 'next/dynamic';
 
+// Use dynamic import with ssr: false to avoid prerendering issues
 const InterviewPage = () => {
   const router = useRouter();
-  const params = useParams();
+  const { id } = router.query;
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -106,11 +107,15 @@ const InterviewPage = () => {
   
   useEffect(() => {
     const fetchJob = async () => {
+      // Don't try to fetch data if id is not available yet
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
       try {
-        if (!params.id) return;
-        
-        const response = await jobs.getById(params.id);
+        const response = await jobs.getById(id);
         setJob(response.data);
       } catch (err) {
         setError('Failed to load job details');
@@ -121,7 +126,7 @@ const InterviewPage = () => {
     };
 
     fetchJob();
-  }, [params.id]);
+  }, [id]);
 
   // Handler for changing time allocation
   const handleTimeChange = (categoryId, newTime) => {
@@ -216,7 +221,7 @@ const InterviewPage = () => {
           return 'bg-indigo-900 text-indigo-300 border border-indigo-700';
         case 'If Time Permits':
           return 'bg-blue-900 text-blue-300 border border-blue-700';
-        case 'Don\'t Ask':
+        case 'Don&apos;t Ask':
           return 'bg-gray-800 text-gray-300 border border-gray-700';
         default:
           return 'bg-gray-800 text-gray-300 border border-gray-700';
@@ -227,7 +232,7 @@ const InterviewPage = () => {
           return 'bg-indigo-100 text-indigo-800 border border-indigo-200';
         case 'If Time Permits':
           return 'bg-blue-100 text-blue-800 border border-blue-200';
-        case 'Don\'t Ask':
+        case 'Don&apos;t Ask':
           return 'bg-gray-100 text-gray-800 border border-gray-200';
         default:
           return 'bg-gray-100 text-gray-800 border border-gray-200';
@@ -242,7 +247,7 @@ const InterviewPage = () => {
         return <CheckCircleIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />;
       case 'If Time Permits':
         return <ClockIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />;
-      case 'Don\'t Ask':
+      case 'Don&apos;t Ask':
         return <XCircleIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />;
       default:
         return null;
@@ -465,10 +470,10 @@ const InterviewPage = () => {
                               <ClockIcon className="h-5 w-5" />
                             </button>
                             <button
-                              onClick={() => handleQuestionStatusChange(category.id, question.id, 'Don\'t Ask')}
-                              title="Don't Ask"
+                              onClick={() => handleQuestionStatusChange(category.id, question.id, 'Don&apos;t Ask')}
+                              title="Don&apos;t Ask"
                               className={`p-1.5 rounded-md transition-colors ${
-                                question.status === 'Don\'t Ask' 
+                                question.status === 'Don&apos;t Ask' 
                                   ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300 ring-1 ring-gray-300 dark:ring-gray-600' 
                                   : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                               }`}
@@ -522,9 +527,9 @@ const InterviewPage = () => {
               </span>
             </div>
             <div className="flex items-center">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClass('Don\'t Ask')}`}>
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClass('Don&apos;t Ask')}`}>
                 <XCircleIcon className="h-4 w-4 mr-1" />
-                <span>Don't Ask</span>
+                <span>Don&apos;t Ask</span>
               </span>
             </div>
           </div>
@@ -534,4 +539,5 @@ const InterviewPage = () => {
   );
 };
 
-export default InterviewPage; 
+// Export with dynamic to disable SSR for this page
+export default dynamic(() => Promise.resolve(InterviewPage), { ssr: false }); 

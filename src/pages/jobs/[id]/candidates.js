@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { jobs } from '@/utils/api';
 import Layout from '@/components/Layout';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 import {
   ArrowLeftIcon,
   UserIcon,
@@ -593,10 +594,12 @@ export default function JobCandidates() {
                       {/* Header with Avatar */}
                       <div className="flex items-start mb-6">
                         <div className="relative">
-                          <img 
+                          <Image 
                             src={candidate.avatar} 
                             alt={candidate.name}
                             className="h-20 w-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                            width={80}
+                            height={80}
                           />
                         </div>
                         
@@ -688,10 +691,12 @@ export default function JobCandidates() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="flex-shrink-0 h-12 w-12 relative">
-                                <img 
+                                <Image 
                                   src={candidate.avatar} 
                                   alt="" 
                                   className="h-12 w-12 rounded-full object-cover"
+                                  width={48}
+                                  height={48}
                                 />
                               </div>
                               <div className="ml-4">

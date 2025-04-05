@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
 import Layout from '@/components/Layout';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 import {
   ArrowLeftIcon,
   UserIcon,
@@ -175,10 +176,12 @@ export default function CandidateProfile() {
                 <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-start">
                     <div className="relative mr-5">
-                      <img 
+                      <Image 
                         src={candidate.avatar} 
                         alt={candidate.name}
                         className="h-24 w-24 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                        width={96}
+                        height={96}
                       />
                       <div className="absolute -bottom-1 -right-1">
                         <span className={`flex items-center justify-center h-7 w-7 rounded-full border ${getStatusColor(candidate.status)}`}>
@@ -298,10 +301,12 @@ export default function CandidateProfile() {
                           <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-gray-700">
                             {/* Placeholder for video thumbnail */}
                             <div className="w-full h-full flex items-center justify-center">
-                              <img 
+                              <Image 
                                 src="https://via.placeholder.com/640x360?text=Video+Thumbnail" 
                                 alt={video.title}
                                 className="w-full h-full object-cover"
+                                width={640}
+                                height={360}
                               />
                             </div>
                             <div className="absolute inset-0 flex items-center justify-center">

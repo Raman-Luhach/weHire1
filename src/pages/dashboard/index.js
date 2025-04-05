@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
 import Layout from '@/components/Layout';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -58,15 +59,15 @@ export default function Dashboard() {
                     <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                       <ul className="space-y-2">
                         <li>
-                          <a href="/jobs" className="text-blue-600 dark:text-blue-400 hover:underline">
+                          <Link href="/jobs" className="text-blue-600 dark:text-blue-400 hover:underline">
                             Browse All Jobs
-                          </a>
+                          </Link>
                         </li>
                         {user.role === 'HR' && (
                           <li>
-                            <a href="/jobs/create" className="text-blue-600 dark:text-blue-400 hover:underline">
+                            <Link href="/jobs/create" className="text-blue-600 dark:text-blue-400 hover:underline">
                               Create New Job
-                            </a>
+                            </Link>
                           </li>
                         )}
                       </ul>
