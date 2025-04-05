@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken, removeToken } from './auth';
 
 // Base API URL - set to port 8000
-const API_URL = 'http://localhost:8000';
+const API_URL = 'https://wehirebackend.onrender.com/';
 
 // Set this to false to use the real API
 const USE_MOCK = false;
