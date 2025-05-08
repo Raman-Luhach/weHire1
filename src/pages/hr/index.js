@@ -14,8 +14,15 @@ export default function HRDashboard() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('card');
   const [hiringManagersList, setHiringManagersList] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [sortBy, setSortBy] = useState('newest');
   const router = useRouter();
   const { user } = useAuth();
+
+  // Get unique locations from jobs list
+  const locations = [...new Set(jobsList.map(job => job.location))].filter(Boolean);
 
   useEffect(() => {
     if (user?.role !== 'HR') {
@@ -29,8 +36,14 @@ export default function HRDashboard() {
           jobs.getAll(),
           hiringManagers.getAll(),
         ]);
-        setJobsList(jobsResponse.data);
-        setFilteredJobs(jobsResponse.data);
+        
+        // Sort jobs by creation date (newest first by default)
+        const sortedJobs = jobsResponse.data.sort((a, b) => 
+          new Date(b.created_at || b.created) - new Date(a.created_at || a.created)
+        );
+        
+        setJobsList(sortedJobs);
+        setFilteredJobs(sortedJobs);
         setHiringManagersList(managersResponse.data);
       } catch (error) {
         toast.error('Failed to fetch data');
@@ -43,20 +56,68 @@ export default function HRDashboard() {
   }, [user, router]);
 
   const handleSearch = (query) => {
-    const filtered = jobsList.filter((job) =>
-      job.title.toLowerCase().includes(query.toLowerCase()) ||
-      job.description.toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredJobs(filtered);
+    setSearchTerm(query);
+    applyFilters(query, statusFilter, locationFilter, sortBy);
   };
 
   const handleStatusChange = (status) => {
-    if (!status) {
-      setFilteredJobs(jobsList);
-      return;
+    setStatusFilter(status);
+    applyFilters(searchTerm, status, locationFilter, sortBy);
+  };
+  
+  const handleLocationChange = (location) => {
+    setLocationFilter(location);
+    applyFilters(searchTerm, statusFilter, location, sortBy);
+  };
+  
+  const handleSortChange = (sort) => {
+    setSortBy(sort);
+    applyFilters(searchTerm, statusFilter, locationFilter, sort);
+  };
+  
+  const applyFilters = (term, status, location, sort) => {
+    let result = [...jobsList];
+    
+    // Filter by search term
+    if (term) {
+      term = term.toLowerCase();
+      result = result.filter(job => 
+        (job.title && job.title.toLowerCase().includes(term)) || 
+        (job.description && job.description.toLowerCase().includes(term)) ||
+        (job.department && job.department.toLowerCase().includes(term)) ||
+        (job.location && job.location.toLowerCase().includes(term))
+      );
     }
-    const filtered = jobsList.filter((job) => job.status === status);
-    setFilteredJobs(filtered);
+    
+    // Filter by status
+    if (status) {
+      result = result.filter(job => job.status === status);
+    }
+    
+    // Filter by location
+    if (location) {
+      result = result.filter(job => job.location === location);
+    }
+    
+    // Sort jobs
+    result = sortJobs(result, sort);
+    
+    setFilteredJobs(result);
+  };
+  
+  const sortJobs = (jobs, sortType) => {
+    switch (sortType) {
+      case 'newest':
+        return [...jobs].sort((a, b) => new Date(b.created_at || b.created) - new Date(a.created_at || a.created));
+      case 'oldest':
+        return [...jobs].sort((a, b) => new Date(a.created_at || a.created) - new Date(b.created_at || b.created));
+      case 'title-asc':
+        return [...jobs].sort((a, b) => a.title.localeCompare(b.title));
+      case 'title-desc':
+        return [...jobs].sort((a, b) => b.title.localeCompare(a.title));
+      default:
+        return jobs;
+    }
   };
 
   const handleDelete = (jobId) => {
@@ -87,7 +148,7 @@ export default function HRDashboard() {
           </h1>
           <button
             onClick={handleCreateJob}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             <PlusIcon className="h-5 w-5 mr-2" />
             Create Job
@@ -97,12 +158,16 @@ export default function HRDashboard() {
         <FilterBar
           onSearch={handleSearch}
           onStatusChange={handleStatusChange}
+          onLocationChange={handleLocationChange}
+          onSortChange={handleSortChange}
           onViewChange={setView}
           view={view}
+          locations={locations}
+          jobCount={filteredJobs.length}
         />
 
         {filteredJobs.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
               No jobs found
             </h3>

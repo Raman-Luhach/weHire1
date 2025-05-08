@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken, removeToken } from './auth';
 
 // Base API URL - set to port 8000
-const API_URL = 'https://wehirebackend.onrender.com/';
+const API_URL = 'http://localhost:8000/';
 
 // Set this to false to use the real API
 const USE_MOCK = false;
@@ -170,6 +170,82 @@ export const jobs = {
   delete: (id) => {
     console.log(`Deleting job with ID: ${id}`);
     return api.delete(`/api/jobs/${id}`);
+  },
+};
+
+// API endpoints for candidates
+export const candidates = {
+  getByJobId: (jobId, filters = {}) => {
+    console.log(`Fetching candidates for job ID: ${jobId}`, filters);
+    
+    // Build query parameters
+    const params = new URLSearchParams();
+    
+    if (filters.skip) params.append('skip', filters.skip);
+    if (filters.limit) params.append('limit', filters.limit);
+    if (filters.search) params.append('search', filters.search);
+    if (filters.status) params.append('status', filters.status);
+    if (filters.minRating) params.append('min_rating', filters.minRating);
+    if (filters.maxRating) params.append('max_rating', filters.maxRating);
+    
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return api.get(`/api/candidates/job/${jobId}${queryString}`);
+  },
+  
+  getById: (candidateId) => {
+    console.log(`Fetching candidate with ID: ${candidateId}`);
+    return api.get(`/api/candidates/${candidateId}`);
+  },
+  
+  create: (candidateData) => {
+    console.log('Creating candidate with data:', candidateData);
+    
+    // Create a clean copy of the data to be submitted
+    const cleanData = { ...candidateData };
+    
+    // Ensure skills is properly formatted as an array
+    if (cleanData.skills && typeof cleanData.skills === 'string') {
+      cleanData.skills = cleanData.skills.split(',').map(skill => skill.trim());
+    }
+    
+    // Ensure job_id is an integer
+    if (cleanData.job_id) {
+      cleanData.job_id = parseInt(cleanData.job_id);
+    }
+    
+    // Format rating as a number
+    if (cleanData.rating) {
+      cleanData.rating = parseFloat(cleanData.rating);
+    }
+    
+    // Ensure status is an integer
+    if (cleanData.status !== undefined) {
+      cleanData.status = parseInt(cleanData.status);
+    }
+    
+    console.log('Sending cleaned data to API:', cleanData);
+    return api.post('/api/candidates', cleanData);
+  },
+  
+  update: (candidateId, candidateData) => {
+    console.log(`Updating candidate ${candidateId} with data:`, candidateData);
+    
+    // Ensure skills is properly formatted as an array if present
+    if (candidateData.skills && typeof candidateData.skills === 'string') {
+      candidateData.skills = candidateData.skills.split(',').map(skill => skill.trim());
+    }
+    
+    // Format rating as a number if present
+    if (candidateData.rating) {
+      candidateData.rating = parseFloat(candidateData.rating);
+    }
+    
+    return api.put(`/api/candidates/${candidateId}`, candidateData);
+  },
+  
+  delete: (candidateId) => {
+    console.log(`Deleting candidate with ID: ${candidateId}`);
+    return api.delete(`/api/candidates/${candidateId}`);
   },
 };
 

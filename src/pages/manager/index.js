@@ -189,27 +189,67 @@ export default function ManagerDashboard() {
 
         {/* Search and Filters */}
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 mb-6 border border-gray-100 dark:border-gray-700">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Filter Jobs</h3>
+            <div className="flex items-center bg-indigo-100 dark:bg-indigo-900/30 px-3 py-1.5 rounded-lg">
+              <ClipboardDocumentListIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400 mr-2" />
+              <span className="text-indigo-800 dark:text-indigo-300 text-sm font-medium">
+                {totalJobs} Jobs Available
+              </span>
+            </div>
+          </div>
+
           <div className="flex flex-col space-y-4">
-            {/* Search */}
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <MagnifyingGlassIcon className="h-5 w-5 text-indigo-500 dark:text-indigo-400" />
+            {/* Search Bar with View Toggle */}
+            <div className="flex items-center space-x-2">
+              <div className="relative flex-grow">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MagnifyingGlassIcon className="h-5 w-5 text-indigo-500 dark:text-indigo-400" />
+                </div>
+                <input
+                  type="text"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors duration-200"
+                  placeholder="Search job titles or descriptions..."
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
               </div>
-              <input
-                type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors duration-200"
-                placeholder="Search job titles or descriptions..."
-                value={searchTerm}
-                onChange={handleSearch}
-              />
+              
+              {/* View Toggle Buttons */}
+              <div className="flex items-center bg-gray-100 dark:bg-gray-700 p-1 rounded-md h-[38px]">
+                <button
+                  onClick={() => handleViewChange('cards')}
+                  className={`flex items-center justify-center py-1.5 px-2.5 rounded-md transition-all duration-200 ${
+                    viewType === 'cards'
+                      ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 shadow-sm'
+                      : 'text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                  aria-label="Card view"
+                  title="Card view"
+                >
+                  <ViewColumnsIcon className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => handleViewChange('list')}
+                  className={`flex items-center justify-center py-1.5 px-2.5 rounded-md transition-all duration-200 ${
+                    viewType === 'list'
+                      ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 shadow-sm'
+                      : 'text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                  aria-label="List view"
+                  title="List view"
+                >
+                  <ListBulletIcon className="h-5 w-5" />
+                </button>
+              </div>
             </div>
             
-            {/* Filters and View Toggle */}
+            {/* Filters */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Sort by Date */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Sort by Date
+                  Sort by
                 </label>
                 <div className="relative">
                   <select
@@ -274,40 +314,6 @@ export default function ManagerDashboard() {
                     <ChevronDownIcon className="h-4 w-4" />
                   </div>
                 </div>
-              </div>
-            </div>
-            
-            {/* Results Count and View Type */}
-            <div className="flex justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-4 mt-2">
-              <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-                Showing <span className="text-indigo-600 dark:text-indigo-400">{filteredJobs.length}</span> jobs
-              </div>
-              <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 p-1 rounded-md">
-                <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">View:</span>
-                <button
-                  onClick={() => handleViewChange('cards')}
-                  className={`p-2 rounded-md transition-all duration-200 ${
-                    viewType === 'cards'
-                      ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 shadow-sm'
-                      : 'text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                  aria-label="Card view"
-                  title="Card view"
-                >
-                  <ViewColumnsIcon className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => handleViewChange('list')}
-                  className={`p-2 rounded-md transition-all duration-200 ${
-                    viewType === 'list'
-                      ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 shadow-sm'
-                      : 'text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                  aria-label="List view"
-                  title="List view"
-                >
-                  <ListBulletIcon className="h-5 w-5" />
-                </button>
               </div>
             </div>
           </div>

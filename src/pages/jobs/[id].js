@@ -18,7 +18,9 @@ import {
   UserGroupIcon,
   ClipboardDocumentListIcon,
   ArrowLeftIcon,
-  CheckIcon
+  CheckIcon,
+  PlusIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline';
 
 const statusOptions = [
@@ -234,7 +236,15 @@ export default function JobDetails() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <button
-              onClick={() => router.back()}
+              onClick={() => {
+                if (user?.role === 'HR') {
+                  router.push('/hr');
+                } else if (user?.role === 'Hiring Manager') {
+                  router.push('/manager');
+                } else {
+                  router.push('/dashboard');
+                }
+              }}
               className="inline-flex items-center text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 group"
             >
               <ArrowLeftIcon className="h-5 w-5 mr-2 transition-transform group-hover:-translate-x-1" />
@@ -243,45 +253,43 @@ export default function JobDetails() {
             
             {/* Job Management Controls */}
             <div className="flex flex-wrap gap-3">
-              {canEdit && (
+              {isHR && (
                 <>
                   <button
-                    onClick={() => router.push(`/jobs/${id}/edit`)}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                    onClick={() => router.push(`/jobs/${job.id}/interview-fix`)}
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200"
                   >
-                    <PencilIcon className="h-4 w-4 mr-2" />
-                    Edit Job
-                  </button>
-                  {user?.role === 'HR' && (
-                    <button
-                      onClick={handleDelete}
-                      className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors duration-200"
-                    >
-                      <XCircleIcon className="h-4 w-4 mr-2" />
-                      Delete
-                    </button>
-                  )}
-                </>
-              )}
-              
-              {isHiringManager && (
-                <>
-                  <button
-                    onClick={navigateToInterviewSchedule}
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200"
-                  >
-                    <ClipboardDocumentListIcon className="h-4 w-4 mr-2" />
-                    Interview Persona
+                    <CalendarIcon className="h-4 w-4 mr-2" />
+                    InterviewFix
                   </button>
                   
                   <button
-                    onClick={navigateToViewCandidates}
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200"
+                    onClick={() => router.push(`/jobs/${job.id}/intervet`)}
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
                   >
                     <UserGroupIcon className="h-4 w-4 mr-2" />
-                    View Candidates
+                    InterVet
                   </button>
                 </>
+              )}
+              
+              {/* View Candidates button - available for both HR and Hiring Manager */}
+              <button
+                onClick={navigateToViewCandidates}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200"
+              >
+                <UserGroupIcon className="h-4 w-4 mr-2" />
+                View Candidates
+              </button>
+              
+              {isHiringManager && (
+                <button
+                  onClick={navigateToInterviewSchedule}
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200"
+                >
+                  <ClipboardDocumentListIcon className="h-4 w-4 mr-2" />
+                  Interview Persona
+                </button>
               )}
             </div>
           </div>
@@ -353,32 +361,32 @@ export default function JobDetails() {
                     </div>
                   </div>
                   
-                  {/* Hiring Manager Info */}
-                  <div className="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="bg-indigo-100 dark:bg-indigo-800 p-2 rounded-full mr-3">
-                          <UserGroupIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                  {/* Hiring Manager Info - only show for HR */}
+                  {isHR && (
+                    <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow transition-all duration-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-full mr-3">
+                            <UserGroupIcon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Hiring Manager</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {job.assigned_manager?.username || job.assigned_manager?.name || 'No manager assigned'}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Hiring Manager</p>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            {job.assigned_manager?.username || job.assigned_manager?.name || 'No manager assigned'}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {isHR && (
+                        
                         <button
                           onClick={openManagerModal}
-                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-indigo-700 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/30 hover:bg-indigo-200 dark:hover:bg-indigo-800/30 border border-indigo-300 dark:border-indigo-700 transition-colors"
+                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 shadow-sm transition-all duration-200"
                         >
                           <PencilIcon className="h-4 w-4 mr-1.5" />
                           {job.assigned_manager ? 'Change Manager' : 'Assign Manager'}
                         </button>
-                      )}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -407,8 +415,163 @@ export default function JobDetails() {
                   </div>
                 </div>
               )}
+              
+              {/* Interview Summary Section - Directly embedded on the page */}
+              {isHR && (
+                <div className="mb-8">
+                  <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white flex items-center">
+                    <ChartBarIcon className="h-6 w-6 mr-2 text-indigo-500 dark:text-indigo-400" />
+                    Interview Summary
+                  </h2>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                      {/* Interview Progress */}
+                      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Interview Progress</h3>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Candidate Screening</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">8/15</span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
+                          <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '53%' }}></div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Interviews Scheduled</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">5/15</span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
+                          <div className="bg-purple-600 h-2.5 rounded-full" style={{ width: '33%' }}></div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Interviews Completed</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">3/15</span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
+                          <div className="bg-green-600 h-2.5 rounded-full" style={{ width: '20%' }}></div>
+                        </div>
+                      </div>
+
+                      {/* Average Rating */}
+                      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Average Candidate Rating</h3>
+                        <div className="flex items-center justify-center h-32">
+                          <div className="text-center">
+                            <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400">4.2</div>
+                            <div className="flex items-center justify-center mt-2">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <svg
+                                  key={star}
+                                  className={`h-5 w-5 ${
+                                    star <= 4 ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 dark:text-gray-600'
+                                  } ${star === 4 ? 'fill-yellow-500 opacity-60' : ''}`}
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              ))}
+                            </div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Based on 3 completed interviews</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Candidates by Stage */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm mb-6">
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Candidates by Stage</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-gray-900 dark:text-white">15</div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">7</div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Screening</p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">5</div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">InterVet</p>
+                        </div>
+                        <div className="bg-gray-50 dark:bg-gray-900/30 p-4 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">InterFix</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stage Distribution */}
+                    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Stage Distribution</h3>
+                      <div className="h-64 flex items-end justify-around px-2">
+                        {[
+                          { stage: 'Applied', count: 15, color: 'bg-gray-500' },
+                          { stage: 'Screening', count: 7, color: 'bg-blue-500' },
+                          { stage: 'InterVet', count: 5, color: 'bg-yellow-500' },
+                          { stage: 'InterFix', count: 3, color: 'bg-purple-500' },
+                          { stage: 'Hired', count: 0, color: 'bg-green-500' }
+                        ].map((item, index) => (
+                          <div key={index} className="flex flex-col items-center">
+                            <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              {item.count > 0 ? `${Math.round((item.count / 15) * 100)}%` : '0%'}
+                            </div>
+                            <div 
+                              className={`w-12 ${item.color} rounded-t-md`} 
+                              style={{ height: item.count > 0 ? `${Math.max((item.count / 15) * 100, 10)}%` : '10px', opacity: item.count > 0 ? 1 : 0.3 }}
+                            ></div>
+                            <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mt-2">
+                              {item.stage}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {item.count}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 text-center">
+                      <button
+                        onClick={() => router.push(`/jobs/${id}/interview-summary`)}
+                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200"
+                      >
+                        <ChartBarIcon className="h-4 w-4 mr-2" />
+                        View Detailed Interview Summary
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Bottom Action Buttons */}
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-4">
+        <div className="flex flex-wrap gap-3 justify-center">
+          {isHR && (
+            <>
+              <button
+                onClick={() => router.push(`/jobs/${id}/candidates/upload`)}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-colors duration-200"
+              >
+                <PlusIcon className="h-4 w-4 mr-2" />
+                Upload Resumes
+              </button>
+              
+              <button
+                onClick={handleDelete}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors duration-200"
+              >
+                <XCircleIcon className="h-4 w-4 mr-2" />
+                Delete
+              </button>
+            </>
+          )}
         </div>
       </div>
 

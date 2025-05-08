@@ -10,7 +10,7 @@ export default function Login() {
   const [credentials, setCredentials] = useState({
     username: '',
     password: '',
-    role: 'HR', // Default selected role
+    role: 'User', // Default selected role
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -208,81 +208,6 @@ export default function Login() {
                   className="appearance-none block w-full pl-10 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700/90 dark:text-white transition-colors duration-200"
                   placeholder="Your password"
                 />
-              </div>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Role
-              </label>
-              <div className="mt-1">
-                <div className="grid grid-cols-2 gap-3">
-                  <label className={`relative flex items-center px-3 py-2 rounded-md border cursor-pointer transition-colors duration-200 ${
-                    credentials.role === 'HR' 
-                      ? 'bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-700' 
-                      : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="role"
-                      value="HR"
-                      checked={credentials.role === 'HR'}
-                      onChange={handleChange}
-                      className="sr-only"
-                    />
-                    <UserCircleIcon className={`h-4 w-4 mr-2 ${
-                      credentials.role === 'HR' 
-                        ? 'text-blue-500 dark:text-blue-400' 
-                        : 'text-gray-400'
-                    }`} />
-                    <span className={`text-sm font-medium ${
-                      credentials.role === 'HR' 
-                        ? 'text-blue-700 dark:text-blue-300' 
-                        : 'text-gray-700 dark:text-gray-300'
-                    }`}>
-                      HR
-                    </span>
-                    {credentials.role === 'HR' && (
-                      <motion.div 
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-2 w-2 bg-blue-500 dark:bg-blue-400 rounded-full"
-                        layoutId="roleIndicator"
-                      ></motion.div>
-                    )}
-                  </label>
-                  
-                  <label className={`relative flex items-center px-3 py-2 rounded-md border cursor-pointer transition-colors duration-200 ${
-                    credentials.role === 'Hiring Manager' 
-                      ? 'bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-700' 
-                      : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="role"
-                      value="Hiring Manager"
-                      checked={credentials.role === 'Hiring Manager'}
-                      onChange={handleChange}
-                      className="sr-only"
-                    />
-                    <BriefcaseIcon className={`h-4 w-4 mr-2 ${
-                      credentials.role === 'Hiring Manager' 
-                        ? 'text-blue-500 dark:text-blue-400' 
-                        : 'text-gray-400'
-                    }`} />
-                    <span className={`text-sm font-medium ${
-                      credentials.role === 'Hiring Manager' 
-                        ? 'text-blue-700 dark:text-blue-300' 
-                        : 'text-gray-700 dark:text-gray-300'
-                    }`}>
-                      Manager
-                    </span>
-                    {credentials.role === 'Hiring Manager' && (
-                      <motion.div 
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-2 w-2 bg-blue-500 dark:bg-blue-400 rounded-full"
-                        layoutId="roleIndicator"
-                      ></motion.div>
-                    )}
-                  </label>
-                </div>
               </div>
             </motion.div>
 

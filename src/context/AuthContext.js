@@ -130,7 +130,31 @@ export function AuthProvider({ children }) {
     }
     setUser(null);
     toast.success('Logged out successfully');
-    router.push('/login');
+    
+    // Force redirect to login page and wait for it to complete
+    router.push('/login').then(() => {
+      // Optional: reload the page to ensure clean state
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+    });
+  };
+
+  // Get the current authentication token
+  const getToken = async () => {
+    // Check if we already have a token in state
+    if (user && user.token) {
+      return user.token;
+    }
+    
+    // Try to get token from localStorage
+    const token = localStorage.getItem('token');
+    if (token) {
+      return token;
+    }
+    
+    // If no token is found, return null or throw an error
+    throw new Error('No authentication token found');
   };
 
   const value = {
@@ -140,6 +164,7 @@ export function AuthProvider({ children }) {
     login,
     signup,
     logout,
+    getToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
